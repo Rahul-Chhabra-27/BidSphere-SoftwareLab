@@ -25,4 +25,5 @@ urlpatterns = [
     path('/checkout',views.checkout,name='checkout-to-payment')
     #dashboard
     path('/dashboard', views.dashboard, name = 'dashboard')
+    path('/not-found',views.notfound,name='not-found')
 ]
