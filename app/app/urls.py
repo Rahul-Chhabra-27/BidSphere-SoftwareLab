@@ -23,4 +23,5 @@ urlpatterns = [
     path('products/<int:id>/', views.product_detail, name='product_detail'),
     #checkout to customers
     path('/checkout',views.checkout,name='checkout-to-payment')
+    path('/home',views.checkout,name,name='my dashboard')
 ]
