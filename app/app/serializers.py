@@ -22,6 +22,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'stock',
             'location',
             'category',
+            'city',
+            'pincode',
             'category_name',
             'created_at',
             'updated_at',
@@ -44,3 +46,34 @@ class ProductSerializer(serializers.ModelSerializer):
             instance.category = category
 
         return super().update(instance, validated_data)
+
+from django.contrib.auth.models import User
+from rest_framework import serializers
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(required=True)
+    full_name = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ["username", "password", "email", "full_name"]
+
+    def validate(self, attrs):
+        if User.objects.filter(email=attrs["email"]).exists():
+            raise serializers.ValidationError({"email": "Email already registered"})
+        return attrs
+
+    def create(self, validated_data):
+        full_name = validated_data.pop("full_name")
+        first_name, *last_parts = full_name.split(" ", 1)
+        last_name = last_parts[0] if last_parts else ""
+
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            email=validated_data["email"],
+            password=validated_data["password"],
+            first_name=first_name,
+            last_name=last_name
+        )
+        return user
