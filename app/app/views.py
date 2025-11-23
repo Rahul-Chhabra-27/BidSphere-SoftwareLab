@@ -61,11 +61,23 @@ class ProductsByCategoryView(APIView):
 
         products = Product.objects.filter(category=category)
 
-        if not products.exists():
-            return Response(
-                {"message": "No products found in this category."},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        location = request.query_params.get('location')
+        if location:
+            products = products.filter(location__icontains=location)
+
+        min_price = request.query_params.get('min_price')
+        if min_price:
+            products = products.filter(price__gte=min_price)
+
+        max_price = request.query_params.get('max_price')
+        if max_price:
+            products = products.filter(price__lte=max_price)
+
+        #if not products.exists():
+        #    return Response(
+        #        {"message": "No products found"},
+        #        status=status.HTTP_404_NOT_FOUND
+        #    )
 
         serializer = ProductSerializer(products, many=True)
         return Response({"data": serializer.data}, status=status.HTTP_200_OK)
